@@ -46,6 +46,21 @@ public class NetworkUtils {
 		});
 	}
 
+	public static String doGetAsync(String url, String tenantId){
+		Request request = new Request.Builder()
+				.url(url)
+				.addHeader("Authorization","Basic YWRtaW46cGFzc3dvcmQ=")
+				.addHeader("X-SiteWhere-Tenant",tenantId) //"sitewhere1234567890"
+				.build();
+		Call call=okHttpClient.newCall(request);
+		try {
+			Response response= call.execute();
+			return response.body().string();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
 
 	public static void doPost(String url, String json,String tenantId, final ResultInfoInterface resultInfoInterface){
 		//上传json
@@ -75,5 +90,29 @@ public class NetworkUtils {
 				resultInfoInterface.onResponse(response.body().string());
 			}
 		});
+	}
+
+	public static String doPostAsync(String url, String json,String tenantId){
+		//上传json
+		//1 设置类型
+		MediaType mediaType=MediaType.parse("application/json");
+		//2 构造RequestBody，json就是实际传入的json字符串的内容
+		RequestBody requestBody=RequestBody.create(mediaType,json);
+		//3 创建Request请求
+		Request request=new Request.Builder()
+				.url(url)
+				.addHeader("Authorization","Basic YWRtaW46cGFzc3dvcmQ=")
+				.addHeader("X-SiteWhere-Tenant",tenantId)
+				.post(requestBody)
+				.build();
+		//4 创建call对象
+		Call call=okHttpClient.newCall(request);
+		try {
+			Response response=call.execute();
+			return response.body().string();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
 	}
 }

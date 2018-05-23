@@ -57,6 +57,12 @@ public class AddDeviceController {
     private String resultTemp = null;
     private String allDeviceList = null;
     private String siteDeviceList = null;
+    private String SiteDevicesresult = null;
+    private String resultAddSite = null;
+    private String resultAddDevice = null;
+    private String  resultAddSafePerson = null;
+    private String  resultAddSafePerson1 = null;
+    private String  resultDeviceList  = null;
 
     //获取site列表
     @RequestMapping(value = "/getSite", method = RequestMethod.GET)
@@ -67,19 +73,7 @@ public class AddDeviceController {
         String url1 = "http://localhost:8080/sitewhere/api/sites?includeAssignments=false&includeZones=false&page=";
         String url2 ="&pageSize=";
         String url = url1+this.page+url2+this.pageSize;
-
-        System.out.println(url);
-        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
-					@Override
-					public void onResponse(String result) {
-                            result1 = result;
-
-					    }
-				});
-        while(result1 == null){
-            System.out.println("a");
-           continue;
-        }
+        result1 = NetworkUtils.doGetAsync(url, sitewhereToken);
         System.out.println(result1);
         return result1;
     }
@@ -87,24 +81,26 @@ public class AddDeviceController {
     @RequestMapping(value = "/addSite",method = RequestMethod.POST)
     public String regist(@RequestBody AddSiteBean addSiteBean){
         String addSite=JSON.toJSONString(addSiteBean);
-        NetworkUtils.doPost("http://localhost:8080/sitewhere/api/sites", addSite, addSiteBean.getSitewhereToken(), new ResultInfoInterface() {
-            @Override
-            public void onResponse(String result) {
-                System.out.println(result);
-            }
-        });
+        resultAddSite = NetworkUtils.doPostAsync("http://localhost:8080/sitewhere/api/sites", addSite,addSiteBean.getSitewhereToken());
+//        NetworkUtils.doPost("http://localhost:8080/sitewhere/api/sites", addSite, addSiteBean.getSitewhereToken(), new ResultInfoInterface() {
+//            @Override
+//            public void onResponse(String result) {
+//                System.out.println(result);
+//            }
+//        });
         return JSON.toJSONString(addSiteBean);
     }
     //添加设备
     @RequestMapping(value = "/addDevice",method = RequestMethod.POST)
     public String addDevice(@RequestBody CreateDeviceBean createDeviceBean){
         String createDevice=JSON.toJSONString(createDeviceBean);
-        NetworkUtils.doPost("http://localhost:8080/sitewhere/api/devices", createDevice, createDeviceBean.getSitewhereToken(), new ResultInfoInterface() {
-            @Override
-            public void onResponse(String result) {
-                System.out.println(result);
-            }
-        });
+        resultAddDevice = NetworkUtils.doPostAsync("http://localhost:8080/sitewhere/api/devices", createDevice,createDeviceBean.getSitewhereToken());
+//        NetworkUtils.doPost("http://localhost:8080/sitewhere/api/devices", createDevice, createDeviceBean.getSitewhereToken(), new ResultInfoInterface() {
+//            @Override
+//            public void onResponse(String result) {
+//                System.out.println(result);
+//            }
+//        });
         return createDevice;
     }
     //添加assetperson 安全管理员并建立连接
@@ -113,30 +109,41 @@ public class AddDeviceController {
     public String addSafePerson(@RequestBody final AddPersonBean addPersonBean){
         String addPerson=JSON.toJSONString(addPersonBean);
         String resultFinal = null;
-        NetworkUtils.doPost("http://localhost:8080/sitewhere/api/assets/categories/default-person-asset/persons", addPerson, addPersonBean.getSitewhereToken(), new ResultInfoInterface() {
-            @Override
-            public void onResponse(String result) {
-                AssociaPersonBean associaPersonBean = new AssociaPersonBean();
-                associaPersonBean.setAssetId(addPersonBean.getId());
-                associaPersonBean.setAssetModuleId("default-person-asset");
-                associaPersonBean.setAssignmentType("Associated");
-                associaPersonBean.setDeviceHardwareId(addPersonBean.getDeviceHardwareId());
-                associaPersonBean.setMetadata(new Metadata());
-                String associaPerson=JSON.toJSONString(associaPersonBean);
-                NetworkUtils.doPost("http://localhost:8080/sitewhere/api/assignments", associaPerson, addPersonBean.getSitewhereToken(), new ResultInfoInterface() {
-                    @Override
-                    public void onResponse(String result) {
-//                        System.out.println(result);
-                        result1 = result;
+        resultAddSafePerson = NetworkUtils.doPostAsync("http://localhost:8080/sitewhere/api/assets/categories/default-person-asset/persons", addPerson,addPersonBean.getSitewhereToken());
+        AssociaPersonBean associaPersonBean = new AssociaPersonBean();
+        associaPersonBean.setAssetId(addPersonBean.getId());
+        associaPersonBean.setAssetModuleId("default-person-asset");
+        associaPersonBean.setAssignmentType("Associated");
+        associaPersonBean.setDeviceHardwareId(addPersonBean.getDeviceHardwareId());
+        associaPersonBean.setMetadata(new Metadata());
+        String associaPerson=JSON.toJSONString(associaPersonBean);
+        resultAddSafePerson1 = NetworkUtils.doPostAsync("http://localhost:8080/sitewhere/api/assignments", associaPerson,addPersonBean.getSitewhereToken());
+        return resultAddSafePerson1;
 
-                    }
-                });
-            }
-        });
-        while(result1 == null){
-            continue;
-        }
-        return result1;
+//        NetworkUtils.doPost("http://localhost:8080/sitewhere/api/assets/categories/default-person-asset/persons", addPerson, addPersonBean.getSitewhereToken(), new ResultInfoInterface() {
+//            @Override
+//            public void onResponse(String result) {
+//                AssociaPersonBean associaPersonBean = new AssociaPersonBean();
+//                associaPersonBean.setAssetId(addPersonBean.getId());
+//                associaPersonBean.setAssetModuleId("default-person-asset");
+//                associaPersonBean.setAssignmentType("Associated");
+//                associaPersonBean.setDeviceHardwareId(addPersonBean.getDeviceHardwareId());
+//                associaPersonBean.setMetadata(new Metadata());
+//                String associaPerson=JSON.toJSONString(associaPersonBean);
+//                NetworkUtils.doPost("http://localhost:8080/sitewhere/api/assignments", associaPerson, addPersonBean.getSitewhereToken(), new ResultInfoInterface() {
+//                    @Override
+//                    public void onResponse(String result) {
+////                        System.out.println(result);
+//                        result1 = result;
+//
+//                    }
+//                });
+//            }
+//        });
+//        while(result1 == null){
+//            continue;
+//        }
+//        return result1;
     }
     //查询用户的spectoken
     @RequestMapping(value = "/getSpecToken", method = RequestMethod.GET)
@@ -171,37 +178,60 @@ public class AddDeviceController {
                 "/assignments?includeDevice=true&includeAsset=true&page=";
         String url2 ="&pageSize=";
         String url = url1+this.page+url2+this.pageSize;
-        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
-            @Override
-            public void onResponse(String result) {
-                List<Data> dataList = new ArrayList<Data>();
-                ResDeviceListBean resDeviceListBean=JSON.toJavaObject(JSON.parseObject(result), ResDeviceListBean.class);
-                for(int i=0;i<resDeviceListBean.getResults().size();i++){
-                    Data data = new Data();
-                    ResultBean res = resDeviceListBean.getResults().get(i);
-                    data.setAssetName(res.getAssetName());
-                    data.setComments(res.getDevice().getComments());
-                    data.setHardwareId(res.getDeviceHardwareId());
-                    data.setName(res.getAssociatedPerson().getName());
-                    data.setId(res.getAssociatedPerson().getId());
-                    data.setEmailAddress(res.getAssociatedPerson().getEmailAddress());
-                    data.setLocationCity(res.getDevice().getMetadata().getLocationCity());
-                    data.setLocationDetial(res.getDevice().getMetadata().getLocationDetial());
-                    data.setCenterLatitude(res.getDevice().getMetadata().getCenterLatitude());
-                    data.setCenterLongitude(res.getDevice().getMetadata().getCenterLongitude());
-                    data.setAssignToken(res.getToken());
-                    dataList.add(data);
-                }
-                deviceList.setData(dataList);
-                deviceListResult = deviceList;
-
-
-            }
-        });
-        while(deviceListResult  == null){
-            continue;
+        resultDeviceList = NetworkUtils.doGetAsync(url, sitewhereToken);
+        List<Data> dataList = new ArrayList<Data>();
+        ResDeviceListBean resDeviceListBean=JSON.toJavaObject(JSON.parseObject(resultDeviceList), ResDeviceListBean.class);
+        for(int i=0;i<resDeviceListBean.getResults().size();i++){
+            Data data = new Data();
+            ResultBean res = resDeviceListBean.getResults().get(i);
+            data.setAssetName(res.getAssetName());
+            data.setComments(res.getDevice().getComments());
+            data.setHardwareId(res.getDeviceHardwareId());
+            data.setName(res.getAssociatedPerson().getName());
+            data.setId(res.getAssociatedPerson().getId());
+            data.setEmailAddress(res.getAssociatedPerson().getEmailAddress());
+            data.setLocationCity(res.getDevice().getMetadata().getLocationCity());
+            data.setLocationDetial(res.getDevice().getMetadata().getLocationDetial());
+            data.setCenterLatitude(res.getDevice().getMetadata().getCenterLatitude());
+            data.setCenterLongitude(res.getDevice().getMetadata().getCenterLongitude());
+            data.setAssignToken(res.getToken());
+            dataList.add(data);
         }
+        deviceList.setData(dataList);
+        deviceListResult = deviceList;
         return JSON.toJSONString(deviceListResult);
+
+//        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
+//            @Override
+//            public void onResponse(String result) {
+//                List<Data> dataList = new ArrayList<Data>();
+//                ResDeviceListBean resDeviceListBean=JSON.toJavaObject(JSON.parseObject(result), ResDeviceListBean.class);
+//                for(int i=0;i<resDeviceListBean.getResults().size();i++){
+//                    Data data = new Data();
+//                    ResultBean res = resDeviceListBean.getResults().get(i);
+//                    data.setAssetName(res.getAssetName());
+//                    data.setComments(res.getDevice().getComments());
+//                    data.setHardwareId(res.getDeviceHardwareId());
+//                    data.setName(res.getAssociatedPerson().getName());
+//                    data.setId(res.getAssociatedPerson().getId());
+//                    data.setEmailAddress(res.getAssociatedPerson().getEmailAddress());
+//                    data.setLocationCity(res.getDevice().getMetadata().getLocationCity());
+//                    data.setLocationDetial(res.getDevice().getMetadata().getLocationDetial());
+//                    data.setCenterLatitude(res.getDevice().getMetadata().getCenterLatitude());
+//                    data.setCenterLongitude(res.getDevice().getMetadata().getCenterLongitude());
+//                    data.setAssignToken(res.getToken());
+//                    dataList.add(data);
+//                }
+//                deviceList.setData(dataList);
+//                deviceListResult = deviceList;
+//
+//
+//            }
+//        });
+//        while(deviceListResult  == null){
+//            continue;
+//        }
+//        return JSON.toJSONString(deviceListResult);
     }
 
     //获取devicelist  筛选by sitetoken
@@ -210,35 +240,37 @@ public class AddDeviceController {
         siteDevicesResult = null;
         String url = "http://localhost:8080/sitewhere/api/sites/" +siteToken+
                 "/assignments?includeDevice=true&includeAsset=true";
-        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
-            @Override
-            public void onResponse(String result) {
-
-                List<Data> dataList = new ArrayList<Data>();
-                ResDeviceListBean resDeviceListBean=JSON.toJavaObject(JSON.parseObject(result), ResDeviceListBean.class);
-                for(int i=0;i<resDeviceListBean.getResults().size();i++){
-                    Data data = new Data();
-                    ResultBean res = resDeviceListBean.getResults().get(i);
-                    data.setAssetName(res.getAssetName());
-                    data.setComments(res.getDevice().getComments());
-                    data.setHardwareId(res.getDeviceHardwareId());
-                    data.setName(res.getAssociatedPerson().getName());
-                    data.setId(res.getAssociatedPerson().getId());
-                    data.setEmailAddress(res.getAssociatedPerson().getEmailAddress());
-                    data.setLocationCity(res.getDevice().getMetadata().getLocationCity());
-                    data.setLocationDetial(res.getDevice().getMetadata().getLocationDetial());
-                    data.setCenterLatitude(res.getDevice().getMetadata().getCenterLatitude());
-                    data.setCenterLongitude(res.getDevice().getMetadata().getCenterLongitude());
-                    data.setAssignToken(res.getToken());
-                    dataList.add(data);
-                }
-                siteDevices.setData(dataList);
-                siteDevicesResult=siteDevices;
-            }
-        });
-        while(siteDevicesResult == null){
-            continue;
+        SiteDevicesresult = NetworkUtils.doGetAsync(url, sitewhereToken);
+        List<Data> dataList = new ArrayList<Data>();
+        ResDeviceListBean resDeviceListBean=JSON.toJavaObject(JSON.parseObject(SiteDevicesresult), ResDeviceListBean.class);
+        for(int i=0;i<resDeviceListBean.getResults().size();i++){
+            Data data = new Data();
+            ResultBean res = resDeviceListBean.getResults().get(i);
+            data.setAssetName(res.getAssetName());
+            data.setComments(res.getDevice().getComments());
+            data.setHardwareId(res.getDeviceHardwareId());
+            data.setName(res.getAssociatedPerson().getName());
+            data.setId(res.getAssociatedPerson().getId());
+            data.setEmailAddress(res.getAssociatedPerson().getEmailAddress());
+            data.setLocationCity(res.getDevice().getMetadata().getLocationCity());
+            data.setLocationDetial(res.getDevice().getMetadata().getLocationDetial());
+            data.setCenterLatitude(res.getDevice().getMetadata().getCenterLatitude());
+            data.setCenterLongitude(res.getDevice().getMetadata().getCenterLongitude());
+            data.setAssignToken(res.getToken());
+            dataList.add(data);
         }
+        siteDevices.setData(dataList);
+        siteDevicesResult=siteDevices;
+//        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
+//            @Override
+//            public void onResponse(String result) {
+//
+//
+//            }
+//        });
+//        while(siteDevicesResult == null){
+//            continue;
+//        }
         return JSON.toJSONString(siteDevicesResult);
     }
 
@@ -251,15 +283,17 @@ public class AddDeviceController {
         String url1 = "http://localhost:8080/sitewhere/api/devices?includeDeleted=false&excludeAssigned=false&includeSpecification=true&includeAssignment=true&page=";
         String url2 ="&pageSize=";
         String url = url1+this.page+url2+this.pageSize;
-        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
-            @Override
-            public void onResponse(String result) {
-                allDeviceList=result;
-            }
-        });
-        while(allDeviceList == null){
-            continue;
-        }
+        allDeviceList = NetworkUtils.doGetAsync(url, sitewhereToken);
+
+//        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
+//            @Override
+//            public void onResponse(String result) {
+//                allDeviceList=result;
+//            }
+//        });
+//        while(allDeviceList == null){
+//            continue;
+//        }
         return allDeviceList;
     }
 
@@ -272,16 +306,18 @@ public class AddDeviceController {
         String url1 = "http://localhost:8080/sitewhere/api/devices?includeDeleted=false&excludeAssigned=false&includeSpecification=true&includeAssignment=true&site="+siteToken+"&page=";
         String url2 ="&pageSize=";
         String url = url1+this.page+url2+this.pageSize;
-        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
-            @Override
-            public void onResponse(String result) {
-                System.out.println(result);
-                siteDeviceList=result;
-            }
-        });
-        while(siteDeviceList == null){
-            continue;
-        }
+        siteDeviceList = NetworkUtils.doGetAsync(url, sitewhereToken);
+
+//        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
+//            @Override
+//            public void onResponse(String result) {
+//                System.out.println(result);
+//                siteDeviceList=result;
+//            }
+//        });
+//        while(siteDeviceList == null){
+//            continue;
+//        }
         return siteDeviceList;
     }
 
@@ -291,18 +327,20 @@ public class AddDeviceController {
     public String getTempVal(@RequestParam(value="assignToken",required = true) String assignToken,@RequestParam(value="sitewhereToken",required = true) String sitewhereToken){
         String url = "http://localhost:8080/sitewhere/api/assignments/" +assignToken+
                 "/measurements/series";
-        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
-            @Override
-            public void onResponse(String result) {
-                resultTemp = result;
-                System.out.println(result);
+        resultTemp = NetworkUtils.doGetAsync(url, sitewhereToken);
 
-            }
-        });
-
-        while(resultTemp == null){
-            continue;
-        }
+//        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
+//            @Override
+//            public void onResponse(String result) {
+//                resultTemp = result;
+//                System.out.println(result);
+//
+//            }
+//        });
+//
+//        while(resultTemp == null){
+//            continue;
+//        }
         return resultTemp;
     }
 

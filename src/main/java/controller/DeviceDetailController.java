@@ -56,19 +56,21 @@ public class DeviceDetailController {
     public String getDetail(@RequestParam(value="hardwareId",required = true) String hardwareId,@RequestParam(value="sitewhereToken",required = true) String sitewhereToken){
 
         String url = "http://localhost:8080/sitewhere/api/devices/"+hardwareId;
-        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
-            @Override
-            public void onResponse(String result) {
-                System.out.println(result);
-                resultDetail = result;
-//                List<MeasureBean> measureBean=JSON.toJavaObject(JSON.parseObject(result), MeasureBean.class);
+        resultDetail = NetworkUtils.doGetAsync(url, sitewhereToken);
 
-
-            }
-        });
-        while(resultDetail == null){
-            continue;
-        }
+//        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
+//            @Override
+//            public void onResponse(String result) {
+//                System.out.println(result);
+//                resultDetail = result;
+////                List<MeasureBean> measureBean=JSON.toJavaObject(JSON.parseObject(result), MeasureBean.class);
+//
+//
+//            }
+//        });
+//        while(resultDetail == null){
+//            continue;
+//        }
         return resultDetail;
     }
 
