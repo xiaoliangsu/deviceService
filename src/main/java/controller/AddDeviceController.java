@@ -63,6 +63,7 @@ public class AddDeviceController {
     private String  resultAddSafePerson = null;
     private String  resultAddSafePerson1 = null;
     private String  resultDeviceList  = null;
+    private String specCommondList =null;
 
     //获取site列表
     @RequestMapping(value = "/getSite", method = RequestMethod.GET)
@@ -284,42 +285,32 @@ public class AddDeviceController {
         String url2 ="&pageSize=";
         String url = url1+this.page+url2+this.pageSize;
         allDeviceList = NetworkUtils.doGetAsync(url, sitewhereToken);
-
-//        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
-//            @Override
-//            public void onResponse(String result) {
-//                allDeviceList=result;
-//            }
-//        });
-//        while(allDeviceList == null){
-//            continue;
-//        }
         return allDeviceList;
     }
 
     //获取site的device
     @RequestMapping(value = "/getSiteDeviceList", method = RequestMethod.GET)
-    public String getSiteDeviceList(@RequestParam(value="page",required=true)int page,@RequestParam(value="pageSize",required=true)int pageSize,@RequestParam(value="siteToken",required = true) String siteToken,@RequestParam(value="sitewhereToken",required = true) String sitewhereToken){
+    public String getSiteDeviceList(@RequestParam(value="deleted",required=false)String deleted,@RequestParam(value="page",required=true)int page,@RequestParam(value="pageSize",required=true)int pageSize,@RequestParam(value="siteToken",required = true) String siteToken,@RequestParam(value="sitewhereToken",required = true) String sitewhereToken){
         this.page =page;
         siteDeviceList = null;
         this.pageSize=pageSize;
-        String url1 = "http://localhost:8080/sitewhere/api/devices?includeDeleted=false&excludeAssigned=false&includeSpecification=true&includeAssignment=true&site="+siteToken+"&page=";
+        String url1 = "http://localhost:8080/sitewhere/api/devices?"+"includeDeleted=false&excludeAssigned=false&includeSpecification=true&includeAssignment=true&site="+siteToken+"&page=";
         String url2 ="&pageSize=";
         String url = url1+this.page+url2+this.pageSize;
         siteDeviceList = NetworkUtils.doGetAsync(url, sitewhereToken);
-
-//        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
-//            @Override
-//            public void onResponse(String result) {
-//                System.out.println(result);
-//                siteDeviceList=result;
-//            }
-//        });
-//        while(siteDeviceList == null){
-//            continue;
-//        }
         return siteDeviceList;
     }
+
+    //获取指令
+
+    @RequestMapping(value = "/getSpecCommond", method = RequestMethod.GET)
+    public String getSpecCommond(@RequestParam(value="specToken",required=true)String specToken,@RequestParam(value="sitewhereToken",required = true) String sitewhereToken){
+
+        String url = "http://localhost:8080/sitewhere/api/specifications/"+specToken+"/namespaces?includeDeleted=false";
+        specCommondList = NetworkUtils.doGetAsync(url, sitewhereToken);
+        return specCommondList;
+    }
+
 
 
 
