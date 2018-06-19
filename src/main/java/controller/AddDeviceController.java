@@ -64,6 +64,7 @@ public class AddDeviceController {
     private String  resultAddSafePerson1 = null;
     private String  resultDeviceList  = null;
     private String specCommondList =null;
+    private String deleteDeviceResult= null;
 
     //获取site列表
     @RequestMapping(value = "/getSite", method = RequestMethod.GET)
@@ -104,6 +105,22 @@ public class AddDeviceController {
 //        });
         return createDevice;
     }
+
+    //删除设备
+    @RequestMapping(value = "/deleteDevice", method = RequestMethod.GET)
+    public String deleteDevice(@RequestParam(value="assignToken",required=true)String assignToken,@RequestParam(value="deviceId",required=true)String deviceId,@RequestParam(value="sitewhereToken",required=true)String sitewhereToken){
+        String url = "http://localhost:8080/sitewhere/api/assignments/"+assignToken+"/end";
+        NetworkUtils.doPostAsync(url, "",sitewhereToken);
+
+        String url2 = "http://localhost:8080/sitewhere/api/devices/"+deviceId+"?force=true";
+        deleteDeviceResult = NetworkUtils.doDeleteAsync(url2,sitewhereToken);
+
+        return deleteDeviceResult;
+    }
+
+
+
+
     //添加assetperson 安全管理员并建立连接
 
     @RequestMapping(value = "/addSafePerson",method = RequestMethod.POST)
@@ -186,6 +203,9 @@ public class AddDeviceController {
             Data data = new Data();
             ResultBean res = resDeviceListBean.getResults().get(i);
             data.setAssetName(res.getAssetName());
+            if(res.getDevice()==null){
+                continue;
+            }
             data.setComments(res.getDevice().getComments());
             data.setHardwareId(res.getDeviceHardwareId());
             data.setName(res.getAssociatedPerson().getName());
@@ -248,6 +268,9 @@ public class AddDeviceController {
             Data data = new Data();
             ResultBean res = resDeviceListBean.getResults().get(i);
             data.setAssetName(res.getAssetName());
+            if(res.getDevice()==null){
+                continue;
+            }
             data.setComments(res.getDevice().getComments());
             data.setHardwareId(res.getDeviceHardwareId());
             data.setName(res.getAssociatedPerson().getName());

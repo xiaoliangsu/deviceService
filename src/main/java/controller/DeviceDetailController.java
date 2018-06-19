@@ -57,21 +57,9 @@ public class DeviceDetailController {
 
         String url = "http://localhost:8080/sitewhere/api/devices/"+hardwareId;
         resultDetail = NetworkUtils.doGetAsync(url, sitewhereToken);
-
-//        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
-//            @Override
-//            public void onResponse(String result) {
-//                System.out.println(result);
-//                resultDetail = result;
-////                List<MeasureBean> measureBean=JSON.toJavaObject(JSON.parseObject(result), MeasureBean.class);
-//
-//
-//            }
-//        });
-//        while(resultDetail == null){
-//            continue;
-//        }
         return resultDetail;
     }
+
+
 
 }

@@ -116,6 +116,23 @@ public class NetworkUtils {
 		return "";
 	}
 
+	public static String doDeleteAsync(String url, String tenantId){
+		Request request = new Request.Builder()
+				.url(url)
+				.addHeader("Authorization","Basic YWRtaW46cGFzc3dvcmQ=")
+				.addHeader("X-SiteWhere-Tenant",tenantId) //"sitewhere1234567890"
+				.delete()
+				.build();
+		Call call=okHttpClient.newCall(request);
+		try {
+			Response response= call.execute();
+			return response.body().string();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+
 	public static String doPutAsync(String url, String json,String tenantId){
 		//上传json
 		//1 设置类型
